@@ -3,16 +3,7 @@ const cors = require("cors");
 const { getDistance } = require("geolib");
 
 const app = express();
-
-// Allow CORS for all origins (or specify your frontend URL)
-app.use(
-  cors({
-    origin: "*", // Replace with your frontend URL if needed (e.g., "https://yourfrontend.com")
-    methods: ["GET", "POST"],
-    allowedHeaders: ["Content-Type"],
-  })
-);
-
+app.use(cors());
 app.use(express.json());
 
 // Restaurant Coordinates
@@ -36,9 +27,9 @@ const calculateDeliveryPrice = (distance) => {
   return 320; // 9.1km to 10km
 };
 
-// API Endpoint to calculate delivery fee
+// API Endpoint to calculate delivery fee (Now GET request)
 app.get("/calculate-delivery", (req, res) => {
-  const { latitude, longitude } = req.query;
+  const { latitude, longitude } = req.query; // Get from query parameters
 
   if (!latitude || !longitude) {
     return res
@@ -46,16 +37,24 @@ app.get("/calculate-delivery", (req, res) => {
       .json({ error: "Latitude and Longitude are required" });
   }
 
+  // Convert latitude and longitude to numbers
+  const lat = parseFloat(latitude);
+  const lon = parseFloat(longitude);
+
   // Calculate distance (in meters) and convert to kilometers
   const distance =
-    getDistance(
-      { latitude: parseFloat(latitude), longitude: parseFloat(longitude) },
-      RESTAURANT_LOCATION
-    ) / 1000;
+    getDistance({ latitude: lat, longitude: lon }, RESTAURANT_LOCATION) / 1000;
 
   const deliveryPrice = calculateDeliveryPrice(distance);
 
   return res.json({ distance: distance.toFixed(2), deliveryPrice });
+});
+
+// Default route for browser testing
+app.get("/", (req, res) => {
+  res.send(
+    "Welcome to the Delivery API! Use /calculate-delivery?latitude=YOUR_LAT&longitude=YOUR_LONG"
+  );
 });
 
 // Start Server
