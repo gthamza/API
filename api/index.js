@@ -27,9 +27,9 @@ const calculateDeliveryPrice = (distance) => {
   return Math.min(50 + (distance - 1) * 30, 320);
 };
 
-// API Route
 app.get("/calculate-delivery", (req, res) => {
   const { latitude, longitude } = req.query;
+
   if (!latitude || !longitude) {
     return res
       .status(400)
@@ -42,8 +42,12 @@ app.get("/calculate-delivery", (req, res) => {
     getDistance({ latitude: lat, longitude: lon }, RESTAURANT_LOCATION) / 1000;
   const deliveryPrice = calculateDeliveryPrice(distance);
 
-  res.setHeader("Access-Control-Allow-Origin", "*"); // ✅ Ensure CORS headers
-  res.json({ distance: distance.toFixed(2), deliveryPrice });
+  // ✅ Set CORS headers manually for each response
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.sendStatus(204);
+  return res.json({ distance: distance.toFixed(2), deliveryPrice });
 });
 
 // Default Route

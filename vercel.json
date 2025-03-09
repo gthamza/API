@@ -9,7 +9,11 @@
   "routes": [
     {
       "src": "/calculate-delivery",
-      "headers": { "Access-Control-Allow-Origin": "*" },
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type"
+      },
       "dest": "api/index.js"
     },
     {
