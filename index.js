@@ -44,6 +44,7 @@ app.get("/api/calculate-delivery", (req, res) => {
       { latitude: parseFloat(latitude), longitude: parseFloat(longitude) },
       RESTAURANT_LOCATION
     ) / 1000;
+
   const deliveryPrice = calculateDeliveryPrice(distance);
 
   return res.json({ distance: distance.toFixed(2), deliveryPrice });
@@ -52,9 +53,12 @@ app.get("/api/calculate-delivery", (req, res) => {
 // 🏠 Default Route
 app.get("/", (req, res) => {
   res.send(
-    "Delivery API is running! Use /api/calculate-delivery?latitude=LAT&longitude=LONG"
+    "✅ Delivery API is running! Use /api/calculate-delivery?latitude=LAT&longitude=LONG"
   );
 });
 
-// 🚀 Export for Vercel
-module.exports = app;
+// ✅ Fix: Koyeb Requires Dynamic PORT
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
