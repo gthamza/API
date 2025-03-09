@@ -27,9 +27,13 @@ const calculateDeliveryPrice = (distance) => {
   return 320; // 9.1km to 10km
 };
 
-// API Endpoint to calculate delivery fee (Now GET request)
+// API Endpoint to calculate delivery fee
 app.get("/calculate-delivery", (req, res) => {
-  const { latitude, longitude } = req.query; // Get from query parameters
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  const { latitude, longitude } = req.query;
 
   if (!latitude || !longitude) {
     return res
@@ -48,6 +52,14 @@ app.get("/calculate-delivery", (req, res) => {
   const deliveryPrice = calculateDeliveryPrice(distance);
 
   return res.json({ distance: distance.toFixed(2), deliveryPrice });
+});
+
+// Handle preflight OPTIONS request
+app.options("*", (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.sendStatus(200);
 });
 
 // Default route for browser testing
