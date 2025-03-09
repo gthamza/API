@@ -4,27 +4,33 @@ const { getDistance } = require("geolib");
 
 const app = express();
 
-// ✅ Allow all origins (for now)
-app.use(cors());
+// ✅ Fix: Apply CORS Middleware Correctly
+app.use(
+  cors({
+    origin: "*", // Allow all origins (change to specific origin in production)
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type"],
+  })
+);
 app.use(express.json());
 
-// ✅ Explicitly set CORS headers for all responses
+// ✅ Fix: Manually Set CORS Headers
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type");
   next();
 });
 
-// ✅ Handle Preflight Requests (OPTIONS)
+// ✅ Fix: Handle Preflight (OPTIONS) Requests
 app.options("*", (req, res) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  res.status(204).end();
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type");
+  res.status(200).end();
 });
 
-// 📌 Restaurant Location
+// 🏠 Restaurant Location
 const RESTAURANT_LOCATION = {
   latitude: 27.853372491266995,
   longitude: 69.11390292443679,
@@ -36,7 +42,7 @@ const calculateDeliveryPrice = (distance) => {
   return Math.min(50 + (distance - 1) * 30, 320);
 };
 
-// 📍 API Route: Calculate Delivery Fee
+// 📌 API Route: Calculate Delivery Fee
 app.get("/calculate-delivery", (req, res) => {
   const { latitude, longitude } = req.query;
 
@@ -52,7 +58,6 @@ app.get("/calculate-delivery", (req, res) => {
     getDistance({ latitude: lat, longitude: lon }, RESTAURANT_LOCATION) / 1000;
   const deliveryPrice = calculateDeliveryPrice(distance);
 
-  res.setHeader("Access-Control-Allow-Origin", "*"); // ✅ Set CORS Header
   return res.json({ distance: distance.toFixed(2), deliveryPrice });
 });
 
@@ -63,5 +68,5 @@ app.get("/", (req, res) => {
   );
 });
 
-// ✅ Export for Vercel Deployment
+// 🚀 Export for Vercel Deployment
 module.exports = app;
