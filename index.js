@@ -4,14 +4,14 @@ const { getDistance } = require("geolib");
 
 const app = express();
 
-// ✅ CORS Middleware Fix for Vercel
-const corsOptions = {
-  origin: "*", // Allow all origins (for testing, restrict it later)
-  methods: "GET,POST,OPTIONS",
-  allowedHeaders: "Content-Type",
-};
-
-app.use(cors(corsOptions));
+// ✅ FIX: CORS Middleware (Make Sure It's at the Top)
+app.use(
+  cors({
+    origin: "*",
+    methods: "GET, POST, OPTIONS",
+    allowedHeaders: "Content-Type",
+  })
+);
 app.use(express.json());
 
 // 🏠 Restaurant Location
@@ -28,6 +28,7 @@ const calculateDeliveryPrice = (distance) => {
 
 // 📌 API Route: Calculate Delivery Fee
 app.get("/calculate-delivery", (req, res) => {
+  // ✅ FIX: Ensure CORS Headers Exist
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -49,7 +50,7 @@ app.get("/calculate-delivery", (req, res) => {
   return res.json({ distance: distance.toFixed(2), deliveryPrice });
 });
 
-// Handle Preflight Requests
+// ✅ FIX: Handle Preflight (OPTIONS) Requests
 app.options("*", (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
