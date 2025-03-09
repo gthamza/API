@@ -4,22 +4,8 @@ const { getDistance } = require("geolib");
 
 const app = express();
 
-// ✅ Enable CORS (Allow requests from frontend)
-app.use(
-  cors({
-    origin: "http://localhost:5173", // Allow frontend to make requests
-    methods: ["GET", "POST", "OPTIONS"],
-    allowedHeaders: ["Content-Type"],
-  })
-);
-
-// ✅ Middleware to set CORS headers for every response
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type");
-  next();
-});
+// ✅ Fix CORS issues
+app.use(cors()); // Allow all origins
 
 app.use(express.json());
 
@@ -29,14 +15,18 @@ const RESTAURANT_LOCATION = {
   longitude: 69.11390292443679,
 };
 
-// 🚚 Calculate delivery price based on distance
+// 🚚 Function to calculate delivery price
 const calculateDeliveryPrice = (distance) => {
   if (distance > 10) return "Out of delivery range";
   return Math.min(50 + (distance - 1) * 30, 320);
 };
 
-// 📌 Route: Calculate Delivery Fee
+// 📌 API Route: Calculate Delivery Fee
 app.get("/calculate-delivery", (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "*"); // ✅ Fix for CORS
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
   const { latitude, longitude } = req.query;
 
   if (!latitude || !longitude) {
@@ -61,7 +51,7 @@ app.get("/", (req, res) => {
   );
 });
 
-// 🚀 Start Server (For local testing)
+// 🚀 Start Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`✅ Server is running on port ${PORT}`);
