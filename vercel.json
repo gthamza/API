@@ -8,7 +8,7 @@
   ],
   "routes": [
     {
-      "src": "/calculate-delivery",
+      "src": "/api/calculate-delivery",
       "dest": "index.js"
     },
     {
