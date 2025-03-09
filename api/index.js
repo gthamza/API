@@ -4,8 +4,15 @@ const { getDistance } = require("geolib");
 
 const app = express();
 
-// Enable CORS
-app.use(cors());
+// Enable CORS properly
+app.use(
+  cors({
+    origin: "*", // Allows requests from all domains (for development)
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type"],
+  })
+);
+
 app.use(express.json());
 
 // Restaurant Coordinates
@@ -22,10 +29,6 @@ const calculateDeliveryPrice = (distance) => {
 
 // API Route
 app.get("/calculate-delivery", (req, res) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
   const { latitude, longitude } = req.query;
   if (!latitude || !longitude) {
     return res
@@ -39,7 +42,8 @@ app.get("/calculate-delivery", (req, res) => {
     getDistance({ latitude: lat, longitude: lon }, RESTAURANT_LOCATION) / 1000;
   const deliveryPrice = calculateDeliveryPrice(distance);
 
-  return res.json({ distance: distance.toFixed(2), deliveryPrice });
+  res.setHeader("Access-Control-Allow-Origin", "*"); // ✅ Ensure CORS headers
+  res.json({ distance: distance.toFixed(2), deliveryPrice });
 });
 
 // Default Route
@@ -49,5 +53,5 @@ app.get("/", (req, res) => {
   );
 });
 
-// Export for Vercel (No app.listen())
+// Export for Vercel
 module.exports = app;

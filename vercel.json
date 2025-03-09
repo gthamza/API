@@ -8,6 +8,11 @@
   ],
   "routes": [
     {
+      "src": "/calculate-delivery",
+      "headers": { "Access-Control-Allow-Origin": "*" },
+      "dest": "api/index.js"
+    },
+    {
       "src": "/(.*)",
       "dest": "api/index.js"
     }
