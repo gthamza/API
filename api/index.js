@@ -4,29 +4,38 @@ const { getDistance } = require("geolib");
 
 const app = express();
 
-// Enable CORS properly
+// ✅ Enable CORS (Allow requests from frontend)
 app.use(
   cors({
-    origin: "*", // Allows requests from all domains (for development)
+    origin: "http://localhost:5173", // Allow frontend to make requests
     methods: ["GET", "POST", "OPTIONS"],
     allowedHeaders: ["Content-Type"],
   })
 );
 
+// ✅ Middleware to set CORS headers for every response
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type");
+  next();
+});
+
 app.use(express.json());
 
-// Restaurant Coordinates
+// 🏠 Restaurant Location
 const RESTAURANT_LOCATION = {
   latitude: 27.853372491266995,
   longitude: 69.11390292443679,
 };
 
-// Function to calculate delivery fee
+// 🚚 Calculate delivery price based on distance
 const calculateDeliveryPrice = (distance) => {
   if (distance > 10) return "Out of delivery range";
   return Math.min(50 + (distance - 1) * 30, 320);
 };
 
+// 📌 Route: Calculate Delivery Fee
 app.get("/calculate-delivery", (req, res) => {
   const { latitude, longitude } = req.query;
 
@@ -42,20 +51,21 @@ app.get("/calculate-delivery", (req, res) => {
     getDistance({ latitude: lat, longitude: lon }, RESTAURANT_LOCATION) / 1000;
   const deliveryPrice = calculateDeliveryPrice(distance);
 
-  // ✅ Set CORS headers manually for each response
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  res.sendStatus(204);
   return res.json({ distance: distance.toFixed(2), deliveryPrice });
 });
 
-// Default Route
+// 🏠 Default Route
 app.get("/", (req, res) => {
   res.send(
-    "Delivery API is working! Use /calculate-delivery?latitude=LAT&longitude=LONG"
+    "Delivery API is running! Use /calculate-delivery?latitude=LAT&longitude=LONG"
   );
 });
 
-// Export for Vercel
+// 🚀 Start Server (For local testing)
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`✅ Server is running on port ${PORT}`);
+});
+
+// 📦 Export for Vercel
 module.exports = app;
